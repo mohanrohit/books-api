@@ -1,0 +1,24 @@
+{
+  "name": "books-platform",
+  "version": "1.0.0",
+  "description": "This is the backend for the Books application, consisting of the API and the database.",
+  "main": "main.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "(https://github.com/mohanrohit/books-platform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sequelize": "^4.39.0"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^4.1.1"
+  }
+}
