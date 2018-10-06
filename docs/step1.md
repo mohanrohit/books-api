@@ -29,6 +29,10 @@ Updates `package.json` to include `sequelize` as a dependency of this project.
 - install sequelize-cli --save-dev (reqd for dev only)
 - sequelize init
   - creates config/ config/config.json models/ seeders/ migrations/
+- rename config/config.json to config/config.js so that dynamic properties can be loaded
+- set database specific values from process.env
+- use .sequelizerc to change settings
+- 
 - sequelize model:create --name Book --attributes "title:string"
 - creates a definition of the Book model and associated migration
 - tweak fields, don't have to specify id, created_at, updated_at (they are expected)
