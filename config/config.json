@@ -1,0 +1,16 @@
+{
+  "development": {
+    "username": "frimcgmpagcllv",
+    "password": "78f6adb33a0b968ff81442cba00275ca24880bec6afc37da027290e2be81adbc",
+    "database": "d6ko6na6npsjn7",
+    "host": "ec2-50-17-194-186.compute-1.amazonaws.com",
+    "dialect": "postgres",
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": true
+    },
+    "define": {
+      "underscored": true
+    }
+  }
+}
