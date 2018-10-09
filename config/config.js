@@ -1,4 +1,3 @@
-/*
 module.exports = {
   development: {
     username: process.env.DB_USERNAME,
@@ -14,6 +13,7 @@ module.exports = {
       underscored: true
     }
   },
+  /*
   test: {
     username: "root",
     password: null,
@@ -28,5 +28,6 @@ module.exports = {
     host: "127.0.0.1",
     dialect: "mysql"
   }
+  */
 };
-*/
+
