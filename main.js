@@ -25,7 +25,7 @@ app.get("/books/:id", async (request, response) => {
 app.post("/books", async (request, response) => {
     if (!request.body.title)
     {
-        response.status(400).send("Title is required.");
+        response.status(400).send({error: "Title is required."});
 
         return;
     }

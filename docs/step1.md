@@ -14,7 +14,7 @@ You're right, creating a `books` table is indeed what you want to do &mdash; exc
 
 As you build your application, your database structure will change &mdash; that's just a given. You'll add more tables; you'll add or remove columns from tables; you'll define relationships between tables &mdash; it's a dynamic, evolving system. You need a tool to manage that evolution; doing it manually will become cumbersome, fast.
 
-Besides, in the application, you'll be using JavaScript objects for the data, but in the database, the data will be organized in rows and columns, *very* unlike an object. You'll need to manage the difference in representation of the data that the application sees versus that which the database sees. Let's see an example &mdash; this will also be a little glimpse of the future.
+Besides, in the application you'll be using JavaScript objects for the data, but in the database, the data will be organized in rows and columns, *very* unlike an object. You'll need to manage the difference in representation of the data that the application sees versus that which the database sees. Let's see an example &mdash; this will also be a little glimpse of the future.
 
 Say in your application, a `Book` object has a list of `Author`s indicating which authors wrote that book. The `Author` object, similarly, has a list of *`Book`s* that author wrote. The application might model it like this:
 
@@ -122,7 +122,7 @@ models/
 seeders/
 ```
 
-As we build the application, database migrations will go in the `migrations` directory, the model objects &mdash; objects representing the database tables &mdash; in the `models` directory, and initial "seed" data, if any, in the `seeders` directory. The `config` directory will hold configuration information in the form of the `config.json` file:
+Each of these directories has a particular purpose. `migrations` holds the database migrations, `models` contains the model objects (objects representing the database tables), and `seeders` contains the initial "seed" data, if any. The `config` directory holds configuration information in the form of the `config.json` file:
 
 ```json
 {
@@ -149,7 +149,7 @@ As we build the application, database migrations will go in the `migrations` dir
   }
 }
 ```
-For now, these are all dummy, placeholder values. Since we're doing this only for development, get rid of all other keys but `development` and change those settings to the actual values for your database environment:
+For now, these are all dummy, placeholder values. Since we're doing this only for development, get rid of all other keys but `development` and change those settings to the actual values for the database you've configured:
 
 ```json
 {
@@ -178,9 +178,9 @@ Now that the configuration is taken care of, let's define a new model &mdash; th
 $ ./node_modules/.bin/sequelize model:generate --name Book --attributes "title:string"
 ```
 
-The `model:generate` command tells `sequelize` to generate a model called `Book` that has the `title` attribute, which is a `string`. And sure enough, after this command, there's a file called `book.js` in your `models` directory (and an `index.js`, which we'll talk about in a bit). There's *also* a new migration in the `migrations` directory, called `20181005183603-create-book.js` (your name will vary because the numeric prefix, as you have undoubtedly noticed, is the current date and time stamp).
+The `model:generate` command tells `Sequelize` to generate a model called `Book` that has the `title` attribute, which is a `string`. And sure enough, after this command, there's a file called `book.js` in your `models` directory (and an `index.js`, which we'll talk about in a bit). There's *also* a new migration in the `migrations` directory, called `20181005183603-create-book.js` (your name will vary because the numeric prefix, as you have undoubtedly noticed, is the current date and time stamp).
 
-Let's check out these files.
+Let's check these files out.
 
 `book.js`, which I've tweaked a bit, looks like this:
 
@@ -202,7 +202,7 @@ module.exports = (sequelize, DataTypes) => {
 };
 
 ```
-I like to keep the schema definition separate from the `sequelize.define()` call, and I like to name my tables explicitly, so those are the changes I made. The `Book` model, I told `sequelize`, corresponds to rows in the `books` table.
+I like to keep the schema definition separate from the `sequelize.define()` call, and I like to name my tables explicitly, so those are the changes I made. The `Book` model, I told `Sequelize`, corresponds to rows in the `books` table.
 
 The migration script, `20181005183603-create-book.js` looks like this:
 
@@ -226,7 +226,7 @@ module.exports = {
 
 ```
 
-All *that*'s doing is defining what happens when you `up`grade or `down`grade your database with this migration. Upgrading will create a new table called `books` (this must match the table name in the model) with the specified columns, and downgrading will do the opposite &mdash; drop that table. You'll also notice that there are three other columns in the table that you never specified in your `model:create` command &mdash; `id`, `created_at` and `updated_at`. These are columns that `sequelize` adds by default. There are ways to override that default behaviour, but you almost always want to keep the `id` column, if not the `created_at` and `updated_at` columns.
+All *that*'s doing is defining what happens when you `up`grade or `down`grade your database with this migration. Upgrading will create a new table called `books` (this must match the table name in the model) with the specified columns, and downgrading will do the opposite &mdash; drop that table. You'll also notice that there are three other columns in the table that you never specified in your `model:create` command &mdash; `id`, `created_at` and `updated_at`. These are columns that `model:create` adds by default. There are ways to override that default behaviour, but you almost always want to keep the `id` column, if not the `created_at` and `updated_at` columns.
 
 And now, for the moment of truth. Run the migration, and behold the newly created table in your database without your having to write the SQL for doing it yourself.
 
@@ -271,6 +271,8 @@ Yes, that's it. No opening connections to the database, no database calls, no SQ
 sequelize deprecated String based operators are now deprecated. Please use Symbol based operators for better security, read more at http://docs.sequelizejs.com/manual/tutorial/querying.html#operators node_modules\sequelize\lib\sequelize.js:242:13
 Executing (default): INSERT INTO "books" ("id","title","created_at","updated_at") VALUES (DEFAULT,'Harry Potter and the Prisoner of Azkaban','2018-10-08 18:09:00.874 +00:00','2018-10-08 18:09:00.874 +00:00') RETURNING *;
 ```
+
+(If you're concerned about that warning above: *sequelize deprecated String based operators are now deprecated*, [here's an explanation and a solution](https://github.com/sequelize/sequelize/issues/8417)).
 
 A couple of things to notice here. First, you didn't need to import the `Book` model. There's no line that says:
 
