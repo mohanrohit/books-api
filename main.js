@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const Joi = require("joi");
 
 const models = require("./models");
 
@@ -10,37 +11,43 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/books", async (request, response) => {
+app.get("/api/v1/books", async (request, response) => {
     var books = await models.Book.findAll();
 
     response.send({ books: books });
 });
 
-app.get("/books/:id", async (request, response) => {
+app.get("/api/v1/books/:id", async (request, response) => {
     var book = await models.Book.findById(parseInt(request.params.id));
 
     book ? response.send(book) : response.status(404).send("Not found");
 });
 
-app.post("/books", async (request, response) => {
-    if (!request.body.title)
+const validationSchema = {
+    title: Joi.string().required().label("A book title is required")
+};
+
+app.post("/api/v1/books", async (request, response) => {
+    const result = Joi.validate(request.body, validationSchema);
+
+    if (result.error)
     {
-        response.status(400).send({error: "Title is required."});
+        response.status(400).send({error: { code: 400, message: result.error.details[0].context.label } });
 
         return;
     }
 
     var newBook = new models.Book(request.body);
-    newBook.save();
+    newBook = await newBook.save();
 
     response.send(newBook);
 });
 
-app.put("/books/:id", async (request, response) => {
+app.put("/api/v1/books/:id", async (request, response) => {
     var book = await models.Book.findById(parseInt(request.params.id));
     if (!book)
     {
-        response.status(400).send(`No book with id ${request.params.id}`);
+        response.status(400).send(`No book with id ${request.params.id} was found.`);
 
         return;
     }
@@ -50,11 +57,28 @@ app.put("/books/:id", async (request, response) => {
         book.title = request.body.title;
     }
 
-    await book.save();
+    book = await book.save();
+
+    response.send(book);
+});
+
+app.delete("/api/v1/books/:id", async (request, response) => {
+    var book = await models.Book.findById(parseInt(request.params.id));
+    if (!book)
+    {
+        response.status(400).send(`No book with id ${request.params.id} was found.`);
+
+        return;
+    }
+
+    await book.destroy();
 
     response.send(book);
 });
 
 app.listen(8080, () => {
     console.log("Server started.");
+    console.log(`Database: ${process.env.DATABASE}`);
+    console.log(`Host: ${process.env.DB_HOST}`);
+    console.log(`User: ${process.env.DB_USERNAME}`);
 });

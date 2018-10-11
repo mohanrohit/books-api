@@ -119,11 +119,12 @@ To serve the API, we need Express, so install it for your application.
 ```bash
 npm install express --save
 ```
-and let's see how we can server this basic API. Right now, let's not bother about code organization &mdash; we'll come to that soon enough.
+
+and let's see how we can serve this basic API. Right now, let's not bother about code organization, or how to test this API &mdash; we'll come to those soon enough.
 
 ### Getting a list of books
 
-Getting a list of books is the easiest of the five operations. There are no validations to make, no special cases, nothing at all but straight retrieval from the database. Here's your updated `main.js`:
+Getting a list of books is one of the easiest of the five operations. There are no validations to make, no special cases, nothing at all but straight retrieval from the database. Here's the updated `main.js` from last time:
 
 ```js
 require("dotenv").config();
@@ -140,13 +141,15 @@ app.get("/books", async (request, response) => {
 });
 ```
 
-First, you `require` the Express module and then instantiate it. The instance variable is usually named `app`, but of course you can call it anything you like.
+To use Express, import the Express module and then instantiate it. The instance variable is usually named `app`, but of course you can call it anything you like.
 
-The function `app.get()` responds to a `GET` request, and it does so for the URL you define &mdash; in this case it is `/api/v1/books`. *What* gets done when someone visits that URL is defined by the second and final parameter to `app.get()`, the function that you write. In this case, we want to return a list of books from the database.
+The function `app.get()` responds to a `GET` request, and it does so for the URL you define &mdash; in this case it is `/api/v1/books`. *What* gets done when someone visits that URL is defined by the second parameter to `app.get()`, the function that you write. In this case, we want to return a list of books from the database.
 
-Now database calls are blocking calls, so we'll have to `await` that database operation. And since `await` can only be used inside functions that are explicitly marked asynchronous, this "handler" function has to be prefixed with the `async` keyword.
+Now database calls are blocking calls, so you have to `await` any database operation. And since `await` can only be used inside functions that are explicitly marked asynchronous, this "handler" function has to be prefixed with the `async` keyword.
 
 ### Getting a particular book
+
+Getting a single book is quite as easy as getting all of them &mdash; no big surprises there. Find the book given its id. If it's found, return it, otherwise return an error.
 
 ```js
 app.get("/books/:id", async (request, response) => {
@@ -157,6 +160,38 @@ app.get("/books/:id", async (request, response) => {
 ```
 
 ### Creating a new book
+
+Now we're getting into the more involved stuff. Not necessarily complicated, but definitely not the one-two line code as in the above two methods.
+
+To create a new book, we have to accept a `POST` request. The URI is `/api/v1/books` &mdash; same as `GET`, but the _action_ is different. We also need to validate that the body of the `POST` request contains the title of the new book we need to add. Once that's validated, we can use the request to create a new `Book` object and save it to the database.
+
+However, to extract the pieces of information we need from the body of the request, we need another NodeJS module called `body-parser`:
+
+```bash
+$ npm install body-parser --save
+```
+
+In `main.js`, import `body-parser` it and use it _before_ any of the handlers:
+
+```js
+require("dotenv").config();
+
+const express = require("express");
+const models = require("./models");
+const bodyParser = require("body-parser");
+
+const app = express();
+
+app.use(bodyParser.json()); // for parsing JSON in the body of the request
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get(...);
+app.post(...); 
+
+// ...
+
+```
+`body-parser` makes it easy to refer to the items in the request body &mdash; they can simply be referred to as `request.body.<param-name>`, like below:
 
 ```js
 app.post("/books", async (request, response) => {
@@ -176,8 +211,11 @@ app.post("/books", async (request, response) => {
 
 ### Updating a particular book
 
+Updating a book requires first looking it up, then changing the attributes specified in the body of the request, and finally saving it back to the database.
+
 ```js
 app.put("/books/:id", async (request, response) => {
+    // first, find the book, ...
     var book = await models.Book.findById(parseInt(request.params.id));
     if (!book)
     {
@@ -186,11 +224,14 @@ app.put("/books/:id", async (request, response) => {
         return;
     }
 
+    // ..., then set the attributes to change, ...
     if (request.body.title)
     {
         book.title = request.body.title;
     }
 
+    // ..., and finally save the book back to the database, now with updated
+    // attributes.
     await book.save();
 
     response.send(book);
