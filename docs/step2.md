@@ -161,7 +161,7 @@ app.get("/books/:id", async (request, response) => {
 
 ### Creating a new book
 
-Now we're getting into the more involved stuff. Not necessarily complicated, but definitely not the one-two line code as in the above two methods.
+Now we're getting into the more involved stuff. Not necessarily complicated, but definitely not the two line code as in the functions.
 
 To create a new book, we have to accept a `POST` request. The URI is `/api/v1/books` &mdash; same as `GET`, but the _action_ is different. We also need to validate that the body of the `POST` request contains the title of the new book we need to add. Once that's validated, we can use the request to create a new `Book` object and save it to the database.
 
@@ -177,8 +177,8 @@ In `main.js`, import `body-parser` it and use it _before_ any of the handlers:
 require("dotenv").config();
 
 const express = require("express");
-const models = require("./models");
 const bodyParser = require("body-parser");
+const models = require("./models");
 
 const app = express();
 
