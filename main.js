@@ -1,6 +1,9 @@
 require("dotenv").config();
 
 const express = require("express");
+const jwt = require("express-jwt");
+const jwtAuth = require("express-jwt-authz");
+const jwksRsa = require("jwks-rsa");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const Joi = require("joi");
@@ -8,6 +11,21 @@ const Joi = require("joi");
 const models = require("./models");
 
 const app = express();
+
+// code adapted from:
+// https://auth0.com/docs/quickstart/backend/nodejs#configure-auth0-apis
+const authorize = jwt({
+  secret: jwksRsa.expressJwtSecret({
+      cache: true,
+      rateLimit: true,
+      jwksRequestsPerMinute: 5,
+      jwksUri: "https://rohitm.auth0.com/.well-known/jwks.json"
+  }),
+
+  audience: "https://api.books.com", // api identifier
+  issuer: "https://rohitm.auth0.com", // auth0 domain
+  algorithms: ["RS256"]
+});
 
 app.use(cors());
 app.use(bodyParser.json());
