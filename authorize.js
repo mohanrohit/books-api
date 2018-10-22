@@ -9,13 +9,13 @@ const authorize = jwt({
         cache: true,
         rateLimit: true,
         jwksRequestsPerMinute: 5,
-        jwksUri: `https://${process.env.AUTHO_DOMAIN}/.well-known/jwks.json`
+        jwksUri: `${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`
     }),
   
-    audience: `${process.env.AUTHO_AUDIENCE}`, // api identifier
-    issuer: `${process.env.AUTHO_DOMAIN}`, // auth0 domain
+    audience: `${process.env.AUTH0_AUDIENCE}`, // api identifier
+    issuer: `${process.env.AUTH0_DOMAIN}`, // auth0 domain
     algorithms: ["RS256"]
-  });
-  
-  module.exports = authorize;
+});
+
+module.exports = authorize;
   
