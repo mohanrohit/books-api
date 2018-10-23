@@ -2,7 +2,7 @@ const express = require("express");
 const Joi = require("joi");
 
 const models = require("../models");
-const authorize = require("../authorize");
+//const authorize = require("../authorize");
 
 const router = express.Router();
 
@@ -22,7 +22,8 @@ const validationSchema = {
     title: Joi.string().required().label("A book title is required")
 };
 
-router.post("/", authorize, async (request, response) => {
+//router.post("/", authorize, async (request, response) => {
+router.post("/", async (request, response) => {
     const result = Joi.validate(request.body, validationSchema);
 
     if (result.error)

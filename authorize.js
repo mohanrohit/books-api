@@ -13,7 +13,7 @@ const authorize = jwt({
     }),
   
     audience: `${process.env.AUTH0_AUDIENCE}`, // api identifier
-    issuer: `${process.env.AUTH0_DOMAIN}`, // auth0 domain
+    issuer: `${process.env.AUTH0_DOMAIN}/`, // auth0 domain
     algorithms: ["RS256"]
 });
 
